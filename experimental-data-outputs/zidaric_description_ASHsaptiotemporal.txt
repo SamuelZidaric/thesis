@@ -1,0 +1,38 @@
+Projected Data Output for C. elegans ASH spatial and temporal Experiments
+Samuel Zidaric
+
+Introduction
+This document outlines the estimated data volume that will be generated during the upcoming experiments involving both ATR+ and ATR- strains of C. elegans. The experiments consist of 20 recordings for each strain, yielding a total of 40 recordings.
+
+Detailed Breakdown
+Raw Data (BTF Files)
+Each recording will initially produce a Binary Tensor Format (BTF) file. With an average size of 125 GB per file, the total for 40 recordings will be approximately 5,000 GB (or 5 TB). However, these files will be converted and deleted subsequently, serving as temporary storage and not contributing to the permanent data storage needs.
+
+Converted Data (AVI Files)
+Post conversion, each BTF file will be transformed into an AVI file. Each AVI file is expected to be around 18.6 GB. Therefore, the total data volume from the AVI files for all 40 recordings will be approximately 744 GB.
+
+Gantry Position Data
+Each recording will also generate an excel file containing the gantry position data, with an average size of around 7 MB. For 40 recordings, this will amount to approximately 280 MB.
+
+LED Data
+There will be a file providing the LED data during the experiment for each recording, with an average size of around 3.40 MB. Therefore, for all 40 recordings, this will yield a total of approximately 136 MB.
+
+DLC Data
+An excel file giving us the DeepLabCut (DLC) data will be generated for each recording, with an average size of around 9.35 MB. For all 40 recordings, this will result in approximately 374 MB.
+
+Data Rate
+Given that each recording lasts for 30 minutes, we can calculate the data rate as follows:
+
+BTF Files: 125 GB per recording equates to approximately 4.17 GB per minute.
+AVI Files: 18.6 GB per recording equates to approximately 0.62 GB per minute.
+Gantry Position Data: 7 MB per recording equates to approximately 0.23 MB per minute.
+LED Data: 3.40 MB per recording equates to approximately 0.11 MB per minute.
+DLC Data: 9.35 MB per recording equates to approximately 0.31 MB per minute.
+Total Data Output
+In summary, here's the total permanent data storage needed for the experiments:
+
+AVI Files: 744 GB
+Gantry Position Data: 280 MB
+LED Data: 136 MB
+DLC Data: 374 MB
+Adding all of these together, we get a total data volume of approximately 745 GB for all 40 recordings.
