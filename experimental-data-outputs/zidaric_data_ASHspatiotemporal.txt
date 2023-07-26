@@ -1,0 +1,19 @@
+Raw Data (BTF Files): 125 GB/recording -> Total for 40 recordings: 5000 GB (5 TB)
+Converted Data (AVI Files): 18.6 GB/recording -> Total for 40 recordings: 744 GB
+Gantry Position Data: 7 MB/recording -> Total for 40 recordings: 280 MB
+LED Data: 3.40 MB/recording -> Total for 40 recordings: 136 MB
+DLC Data: 9.35 MB/recording -> Total for 40 recordings: 374 MB
+
+Data rate:
+BTF Files: 4.17 GB/minute
+AVI Files: 0.62 GB/minute
+Gantry Position Data: 0.23 MB/minute
+LED Data: 0.11 MB/minute
+DLC Data: 0.31 MB/minute
+
+Total Data Output:
+AVI Files: 744 GB
+Gantry Position Data: 280 MB
+LED Data: 136 MB
+DLC Data: 374 MB
+Total data volume: ~745 GB for 40 recordings
