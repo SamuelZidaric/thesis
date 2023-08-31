@@ -24,10 +24,10 @@ def plot_camera_trajectory(coordinates_xy_gp: np.array, point_size: float = .02)
     plt.xlabel("x'-position [mm]")
     plt.ylabel("y'-position [mm]")
 
-    # plt.savefig("plot_atr_neg_wrm3.svg")    # Uncomment to save in svg file
+    # plt.savefig("NAME_OF_PLOT_FILE.svg")    # Uncomment to save the plot as an SVG file    
     plt.show()
 
 # example call:
 if __name__ == '__main__':
-    path_gp = r"Z:\neurobiology\zimmer\zidaric\data\oas2\loop_activation\2023_08_29_11_42_loop_activation_atr_neg_wrm1_sam\2023_08_29_11_42_loop_activation_atr_neg_wrm1_sam_gantry_position.csv"
+    path_gp = r"PATH_TO_TEH_GANTRY_POSITION_CSV"
     plot_camera_trajectory(load_gp_coordinates(path_gp))
