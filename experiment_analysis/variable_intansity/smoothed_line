@@ -1,0 +1,69 @@
+# Import necessary libraries
+import pandas as pd
+import glob
+import os
+import numpy as np
+
+# Your main path
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+
+# Glob pattern to match the file structure you mentioned
+rev_reaction_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
+
+# Initialize an empty DataFrame to store all data
+all_data = pd.DataFrame()
+
+# Loop through each file path in the list
+for file_path in rev_reaction_paths_list:
+    # Read the current Excel file
+    temp_data = pd.read_excel(file_path)
+    
+    # Filter out activations beyond the 30th, if the 'Activation' column exists
+    if 'Activation' in temp_data.columns:
+        temp_data = temp_data[temp_data['Activation'] <= 30]
+
+    # For example, extracting a part of the file_path as an identifier
+    temp_data['Identifier'] = os.path.basename(os.path.dirname(os.path.dirname(file_path)))
+    
+    # Append the data from the current file to the all_data DataFrame
+    all_data = pd.concat([all_data, temp_data], ignore_index=True)
+
+# Further processing can be added here
+
+# Further processing and analysis
+# Define the subdivision values for each activation in the specified order
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Categorizing 'Status/Reaction Time' into specific statuses
+all_data['Status'] = np.where(all_data['Status/Reaction Time'] == 'No Reversal', 'No Reversal',
+                              np.where(all_data['Status/Reaction Time'] == 'Already Reversing', 'Already Reversing', 'Valid Reversals'))
+
+# Assigning subdivision values to each row based on the activation number, if present
+all_data['Subdivision'] = all_data['Activation'].apply(lambda x: subdivision_values[x-1] if x <= len(subdivision_values) else None)
+
+# Plotting
+import matplotlib.pyplot as plt
+from scipy.interpolate import UnivariateSpline
+
+# Grouping data by 'Subdivision' and 'Status', counting occurrences
+grouped_data = all_data.groupby(['Subdivision', 'Status']).size().reset_index(name='Counts')
+
+# Filtering for 'Valid Reversals' only
+valid_reversals = grouped_data[grouped_data['Status'] == 'Valid Reversals']
+
+# Creating a smooth line plot for valid reversals across subdivisions
+x_values = valid_reversals['Subdivision']
+y_values = valid_reversals['Counts']
+spline = UnivariateSpline(x_values, y_values, s=0)
+x_smooth = np.linspace(x_values.min(), x_values.max(), 300)
+y_smooth = spline(x_smooth)
+
+plt.figure(figsize=(12, 7))
+plt.plot(x_smooth, y_smooth, color='blue', label='Smoothed Valid Reversals')
+plt.scatter(x_values, y_values, color='red', label='Actual Counts')  # Actual points for reference
+plt.title('Smoothed Line Connecting Counts of Valid Reversals')
+plt.xlabel('Subdivision Group')
+plt.ylabel('Count of Valid Reversals')
+plt.legend()
+plt.grid(True)
+plt.show()
