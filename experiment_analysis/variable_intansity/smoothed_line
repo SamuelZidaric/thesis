@@ -5,7 +5,7 @@ import os
 import numpy as np
 
 # Your main path
-main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
 
 # Glob pattern to match the file structure you mentioned
 rev_reaction_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
@@ -58,12 +58,24 @@ spline = UnivariateSpline(x_values, y_values, s=0)
 x_smooth = np.linspace(x_values.min(), x_values.max(), 300)
 y_smooth = spline(x_smooth)
 
+# Calculating frequencies of 'Valid Reversals'
+total_counts_per_subdivision = all_data.groupby('Subdivision').size()
+valid_reversals['Frequency'] = valid_reversals.apply(lambda row: row['Counts'] / total_counts_per_subdivision[row['Subdivision']], axis=1)
+
+# Creating a smooth line plot for frequencies of valid reversals across subdivisions
+x_values_frequency = valid_reversals['Subdivision']
+y_values_frequency = valid_reversals['Frequency']
+spline_frequency = UnivariateSpline(x_values_frequency, y_values_frequency, s=0)
+x_smooth_frequency = np.linspace(x_values_frequency.min(), x_values_frequency.max(), 300)
+y_smooth_frequency = spline_frequency(x_smooth_frequency)
+
 plt.figure(figsize=(12, 7))
-plt.plot(x_smooth, y_smooth, color='blue', label='Smoothed Valid Reversals')
-plt.scatter(x_values, y_values, color='red', label='Actual Counts')  # Actual points for reference
-plt.title('Smoothed Line Connecting Counts of Valid Reversals')
+plt.plot(x_smooth_frequency, y_smooth_frequency, color='blue', label='Smoothed Frequency of Valid Reversals')
+plt.scatter(x_values_frequency, y_values_frequency, color='red', label='Actual Frequencies')  # Actual points for reference
+plt.title('Smoothed Line Connecting Frequencies of Induced Reversals')
 plt.xlabel('Subdivision Group')
-plt.ylabel('Count of Valid Reversals')
+plt.ylabel('Frequency of Valid Reversals')
+plt.ylim(0, 1)  # Set the y-axis to range from 0 to 100
 plt.legend()
 plt.grid(True)
 plt.show()
