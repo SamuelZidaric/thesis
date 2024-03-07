@@ -1,0 +1,72 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
+import glob
+import numpy as np
+
+# Define the main path to your data and the mapping from Activation numbers to intensity levels
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Function to aggregate reversal durations and intensity levels into a DataFrame
+def create_reversal_duration_dataframe(main_path, subdivision_values):
+    rev_reaction_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
+    df_list = []
+
+    for path in rev_reaction_paths_list:
+        df = pd.read_excel(path)
+        df = df[df['Activation'] <= 30]  # Filter activations up to 30
+        
+        for index, row in df.iterrows():
+            activation_index = row['Activation'] - 1
+            intensity = subdivision_values[activation_index % len(subdivision_values)]
+            
+            # Use 'Reversal duration' instead of 'Status/Reaction Time'
+            reversal_duration = row.get('Reversal duration', np.nan)
+            
+            if not pd.isna(reversal_duration):
+                df_list.append({'Intensity': intensity, 'Reversal Duration': reversal_duration})
+    
+
+    return pd.DataFrame(df_list)
+
+# Function to plot reversal durations with jitter and sample size annotations
+def plot_reversal_durations_with_jitter_and_n(df):
+    plt.figure(figsize=(12, 8))
+    
+    # Exclude the 0 intensity subgroup
+    df_filtered = df[df['Intensity'] != 0]
+    
+    # Define the order of the x-axis, excluding 0, before plotting
+    intensity_order = sorted(df_filtered['Intensity'].unique())
+    
+    # Boxplot with alpha to see through
+    sns.boxplot(x='Intensity', y='Reversal Duration', data=df_filtered, order=intensity_order, boxprops=dict(alpha=.3))
+    # Jittering with stripplot
+    sns.stripplot(x='Intensity', y='Reversal Duration', data=df_filtered, order=intensity_order, color='black', jitter=True, alpha=0.5)
+    
+    plt.title('Reversal Durations by Intensity Level in ATR+')
+    plt.xlabel('Intensity Level')
+    plt.ylabel('Reversal Duration (seconds)')
+    
+    # Annotate with the sample size
+    for intensity in intensity_order:
+        n = len(df_filtered[df_filtered['Intensity'] == intensity])
+        y_pos = df_filtered[df_filtered['Intensity'] == intensity]['Reversal Duration'].max() + df_filtered['Reversal Duration'].std() * 0.1
+        plt.text(x=intensity, y=y_pos, s=f'n={n}', horizontalalignment='center')
+
+    # Ensure x-axis labels match the order
+    plt.xticks(range(len(intensity_order)), intensity_order, rotation=45)  # Rotate labels to avoid overlap
+    # Annotate total sample size
+    total_sample_size = len(df_filtered)
+    plt.text(0.895, 0.915, f'n = {total_sample_size}', transform=plt.gcf().transFigure, 
+             ha='right', va='top', bbox=dict(facecolor='white', alpha=0.5))
+
+    plt.show()
+
+# Aggregate the reversal durations and intensities into a DataFrame
+df_durations = create_reversal_duration_dataframe(main_path, subdivision_values)
+
+# Plot the reversal durations with jittering and sample size annotations
+plot_reversal_durations_with_jitter_and_n(df_durations)

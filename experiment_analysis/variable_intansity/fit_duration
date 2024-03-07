@@ -1,0 +1,61 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
+import glob
+import numpy as np
+
+# Define the main path to your data and the mapping from Activation numbers to intensity levels
+group_1_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
+group_2_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Function to aggregate reversal durations and intensity levels into a DataFrame
+def create_reversal_duration_dataframe(paths, subdivision_values):
+    df_list = []
+
+    for path in paths:
+        df = pd.read_excel(path)
+        df = df[df['Activation'] <= 30]  # Filter activations up to 30
+        
+        for index, row in df.iterrows():
+            activation_index = row['Activation'] - 1
+            intensity = subdivision_values[activation_index % len(subdivision_values)]
+            
+            # Use 'Reversal duration' instead of 'Status/Reaction Time'
+            reversal_duration = row.get('Reversal duration', np.nan)
+            
+            if not pd.isna(reversal_duration):
+                df_list.append({'Intensity': intensity, 'Reversal Duration': reversal_duration})
+    
+
+    return pd.DataFrame(df_list)
+
+def plot_reversal_durations_with_jitter_and_regression_only(df, label):
+    plt.figure(figsize=(12, 8))
+    
+    # Exclude the 0 intensity subgroup
+    df_filtered = df[df['Intensity'] != 0]
+        
+    # Calculate medians and plot them
+    median_duration = df_filtered.groupby('Intensity')['Reversal Duration'].median().reset_index()
+
+    sns.scatterplot(x='Intensity', y='Reversal Duration', data=median_duration, color='green', s=100, label=f'{label} Median')
+    plt.plot(median_duration['Intensity'], median_duration['Reversal Duration'], color='green', label=f'{label} Median Line')
+
+    plt.title(f'Reversal Durations by Intensity Level with Regression Line ({label})')
+    plt.xlabel('Intensity Level')
+    plt.ylabel('Reversal Duration (seconds)')
+    plt.ylim(0, 12)
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+# Process the datasets
+df_group_1 = create_reversal_duration_dataframe(glob.glob(os.path.join(group_1_path, 'w*/*Ch0/rev_reaction.xlsx')), subdivision_values)
+df_group_2 = create_reversal_duration_dataframe(glob.glob(os.path.join(group_2_path, 'w*/*Ch0/rev_reaction.xlsx')), subdivision_values)
+
+# Plot the reversal durations with jittering and sample size annotations
+plot_reversal_durations_with_jitter_and_regression_only(df_group_2, 'ATR-')
+

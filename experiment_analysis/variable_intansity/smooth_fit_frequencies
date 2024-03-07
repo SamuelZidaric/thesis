@@ -3,6 +3,8 @@ import pandas as pd
 import glob
 import os
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy.interpolate import UnivariateSpline
 
 # Your main path
 main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
@@ -41,10 +43,6 @@ all_data['Status'] = np.where(all_data['Status/Reaction Time'] == 'No Reversal',
 # Assigning subdivision values to each row based on the activation number, if present
 all_data['Subdivision'] = all_data['Activation'].apply(lambda x: subdivision_values[x-1] if x <= len(subdivision_values) else None)
 
-# Plotting
-import matplotlib.pyplot as plt
-from scipy.interpolate import UnivariateSpline
-
 # Grouping data by 'Subdivision' and 'Status', counting occurrences
 grouped_data = all_data.groupby(['Subdivision', 'Status']).size().reset_index(name='Counts')
 
@@ -72,8 +70,8 @@ y_smooth_frequency = spline_frequency(x_smooth_frequency)
 plt.figure(figsize=(12, 7))
 plt.plot(x_smooth_frequency, y_smooth_frequency, color='blue', label='Smoothed Frequency of Valid Reversals')
 plt.scatter(x_values_frequency, y_values_frequency, color='red', label='Actual Frequencies')  # Actual points for reference
-plt.title('Smoothed Line Connecting Frequencies of Induced Reversals')
-plt.xlabel('Subdivision Group')
+plt.title('Smoothed Line Connecting Frequencies of Induced Reversals in ATR+')
+plt.xlabel('Intensity Level')
 plt.ylabel('Frequency of Valid Reversals')
 plt.ylim(0, 1)  # Set the y-axis to range from 0 to 100
 plt.legend()

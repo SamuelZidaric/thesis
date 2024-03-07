@@ -1,0 +1,64 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
+import glob
+import numpy as np
+
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+
+def create_reaction_time_dataframe(main_path, subdivision_values):
+    rev_reaction_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
+    df_list = []
+
+    for path in rev_reaction_paths_list:
+        df = pd.read_excel(path)
+        # Filter activations up to 30
+        df = df[df['Activation'] <= 30]
+        
+        for index, row in df.iterrows():
+            activation_index = row['Activation'] - 1
+            intensity = subdivision_values[activation_index % len(subdivision_values)]
+            reaction_time = pd.to_numeric(row['Status/Reaction Time'], errors='coerce')
+            
+            if not pd.isna(reaction_time):
+                df_list.append({'Intensity': intensity, 'Reaction Time': reaction_time})
+    
+    return pd.DataFrame(df_list)
+
+def plot_reaction_times(df):
+    plt.figure(figsize=(12, 8))
+    # Exclude the 0 intensity subgroup
+    df_filtered = df[df['Intensity'] != 0]
+    # Define the order of the x-axis, excluding 0, before plotting
+    intensity_order = sorted(df_filtered['Intensity'].unique())
+    # Boxplot
+    sns.boxplot(x='Intensity', y='Reaction Time', data=df_filtered, order=intensity_order, boxprops=dict(alpha=.3))
+    # Jittering with stripplot
+    sns.stripplot(x='Intensity', y='Reaction Time', data=df_filtered, order=intensity_order, color='black', jitter=True, alpha=0.5)
+    plt.title('Reaction Times by Intensity Level in ATR-')
+    plt.xlabel('Intensity Level Subgroups')
+    plt.ylabel('Reaction Time (seconds)')
+    # Annotate with the sample size
+    for intensity in sorted(df_filtered['Intensity'].unique()):
+        n = len(df_filtered[df_filtered['Intensity'] == intensity])
+        # Adjust the position for text annotation slightly above the highest data point for clarity
+        y_pos = df_filtered[df_filtered['Intensity'] == intensity]['Reaction Time'].max() + df_filtered['Reaction Time'].std() * 0.1
+        plt.text(x=intensity, y=y_pos, s=f'n={n}', horizontalalignment='center')
+    # Ensure x-axis labels match the order
+    plt.xticks(range(len(intensity_order)), intensity_order, rotation=45)  # Rotate labels to avoid overlap
+    # Annotate total sample size
+    total_sample_size = len(df_filtered)    
+    plt.text(0.895, 0.915, f'n = {total_sample_size}', transform=plt.gcf().transFigure, 
+             ha='right', va='top', bbox=dict(facecolor='white', alpha=0.5))
+
+    plt.show()
+
+# Define the main path to your data and the mapping from Activation numbers to intensity levels
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Aggregate the reaction times and intensities into a DataFrame
+df = create_reaction_time_dataframe(main_path, subdivision_values)
+
+# Plot the reaction times
+plot_reaction_times(df)

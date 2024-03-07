@@ -1,0 +1,27 @@
+import pandas as pd
+import os
+import glob
+
+# Your main path
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_neg_uli/data/'
+
+paths = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
+
+def create_reaction_time_dataframe_without_subdivision(paths):
+    df_list = []
+    for path in paths:
+        df = pd.read_excel(path)
+        df = df[df['Activation'] <= 56]  # Filter activations up to 30
+        for _, row in df.iterrows():
+            reaction_time = pd.to_numeric(row['Status/Reaction Time'], errors='coerce')
+            if not pd.isna(reaction_time):
+                df_list.append({'Reaction Time': reaction_time})
+    return pd.DataFrame(df_list)
+
+# Create the dataset
+dataset = create_reaction_time_dataframe_without_subdivision(paths)
+
+# Save the dataset to an HDF5 file
+dataset.to_hdf('reaction_times_neg.h5', key='df', mode='w')
+
+print("Dataset has been saved to 'reaction_times_neg.h5'")

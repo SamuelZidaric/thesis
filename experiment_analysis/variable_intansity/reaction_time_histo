@@ -1,0 +1,58 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
+import glob
+import numpy as np
+
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
+
+def create_reaction_time_dataframe(main_path, subdivision_values):
+    rev_reaction_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
+    df_list = []
+
+    for path in rev_reaction_paths_list:
+        # Extract folder identifier (assuming it's the part after 'w' and before the next '/')
+        folder_identifier = path.split(os.sep)[-3]  # Adjust index according to your path structure
+        df = pd.read_excel(path)
+        # Filter activations up to 30
+        df = df[df['Activation'] <= 30]
+        
+        for index, row in df.iterrows():
+            activation_index = row['Activation'] - 1
+            intensity = subdivision_values[activation_index % len(subdivision_values)]
+            reaction_time = pd.to_numeric(row['Status/Reaction Time'], errors='coerce')
+            
+            if not pd.isna(reaction_time):
+                df_list.append({'Folder': folder_identifier, 'Intensity': intensity, 'Reaction Time': reaction_time})
+
+    return pd.DataFrame(df_list)
+
+def plot_reaction_times(df):
+    overall_medians_df = df.groupby('Intensity')['Reaction Time'].median().reset_index(name='Median Reaction Time')
+    filtered_df = df[df['Intensity'] != 0]
+    # Set up the FacetGrid
+    g = sns.FacetGrid(filtered_df, col="Intensity", col_wrap=4, sharex=False, sharey=False)
+    g.map(sns.histplot, "Reaction Time", kde=False, binwidth=0.5)
+
+    # Add titles and adjust spacing
+    g.fig.suptitle('Histograms of Reaction Times by Intensity Level', y=1.02)
+    g.set_axis_labels("Reaction Time (seconds)", "Count")
+    g.set_titles("Intensity {col_name}")
+    plt.figure(figsize=(12, 8))
+    sns.pointplot(x='Intensity', y='Median Reaction Time', data=overall_medians_df, color='blue', markers='o', linestyles='--')
+    plt.title('Overall Median Reaction Times by Intensity Level')
+    plt.xlabel('Intensity Level')
+    plt.ylabel('Median Reaction Time (seconds)')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+# Define the main path to your data and the mapping from Activation numbers to intensity levels
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Aggregate the reaction times and intensities into a DataFrame
+df = create_reaction_time_dataframe(main_path, subdivision_values)
+
+# Plot the reaction times
+plot_reaction_times(df)

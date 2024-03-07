@@ -48,14 +48,14 @@ barplot = sns.barplot(x='Group', y='Total Valid Reversals', data=combined_data, 
 for index, row in combined_data.iterrows():
     # Adjust these values as needed for optimal placement
     height = row['Total Valid Reversals']
-    sample_size_text = f'Positive events: {row["Sample Size"]}'
+    sample_size_text = f'n = {row["Sample Size"]}'
     x_position = index
     y_position = height + 0.05 * max(combined_data['Total Valid Reversals'])  # Adjust this for separation
 
-    plt.text(x_position, y_position, sample_size_text, color='black', ha="center", va='bottom')
+    plt.text(x_position, y_position, sample_size_text, color='black', ha="center", va='bottom', weight='semibold', bbox=dict(facecolor='white', alpha=0.5))
 
-plt.title('Comparison of Total Valid Reversals Between ATR+ and ATR- Groups')
-plt.ylabel('Total Valid Reversals')
+plt.title('Comparison of Total Induced Reversals Between ATR+ and ATR- Groups')
+plt.ylabel('Total Induced Reversals')
 plt.xlabel('Experimental Group')
 plt.xticks(rotation=45)  # Adjust or remove rotation based on your preference
 plt.ylim(0, 1.2 * max(combined_data['Total Valid Reversals']))  # Extend y-axis limit for text space

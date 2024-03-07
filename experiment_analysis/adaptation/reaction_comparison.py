@@ -53,13 +53,13 @@ sample_sizes = all_reaction_times.groupby('Group').size().reset_index(name='Samp
 # Annotate the boxplot with the sample sizes
 for i, (group, sample_size) in enumerate(zip(sample_sizes['Group'], sample_sizes['Sample Size'])):
     # Positioning the text annotation above the boxplot
-    plt.text(i, all_reaction_times['Numeric Reaction Time'].max() + 0.05, f'Sample Size: {sample_size}', 
-             horizontalalignment='center', size=10, color='black', weight='semibold')
+    plt.text(i, all_reaction_times['Numeric Reaction Time'].max() + 0.07, f'n = {sample_size}', 
+             horizontalalignment='center', size=10, color='black', weight='semibold', bbox=dict(facecolor='white', alpha=0.5))
 
 plt.title('Comparison of Reaction Times Between ATR+ and ATR- Groups')
 plt.ylabel('Reaction Time (seconds)')
 plt.xlabel('Experimental Group')
-plt.ylim(all_reaction_times['Numeric Reaction Time'].min(), all_reaction_times['Numeric Reaction Time'].max() + 0.1)  # Adjust ylim to fit annotations
+plt.ylim(0, 2.2)  # Adjust ylim to fit annotations
 
 plt.tight_layout()
 plt.show()

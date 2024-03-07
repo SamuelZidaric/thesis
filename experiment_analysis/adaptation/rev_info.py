@@ -1,8 +1,9 @@
 import pandas as pd
 import os
 import glob
+import numpy as np  # Add this import at the beginning of your script
 
-main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_neg_uli/data/'
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_pos_uli/data/'
 
 # Function to perform data analysis
 def perform_data_analysis(main_path):
@@ -40,8 +41,11 @@ def perform_data_analysis(main_path):
 
     # Safe calculation of averages
     average_reaction_time = sum(all_reaction_times) / len(all_reaction_times) if all_reaction_times else None
+    median_reaction_time = np.median(all_reaction_times) if all_reaction_times else None
     average_reversal_duration = sum(all_durations) / len(all_durations) if all_durations else None
+    median_reversal_duration = np.median(all_durations) if all_durations else None
     average_duration_induced_reversals = sum(induced_reversal_durations) / len(induced_reversal_durations) if induced_reversal_durations else None
+    median_duration_induced_reversals = np.median(induced_reversal_durations) if induced_reversal_durations else None
 
     total_reversals = len(all_durations)
     induced_reversals_count = status_counts.get('Reversals', 0)
@@ -53,8 +57,11 @@ Comprehensive Data Analysis Summary:
 
 Overall Dataset Summary:
 - Average Reaction Time: {'N/A' if average_reaction_time is None else f'{average_reaction_time:.2f}'} seconds
+- Median Reaction Time: {'N/A' if median_reaction_time is None else f'{median_reaction_time:.2f}'} seconds
 - Average Reversal Duration (Total): {'N/A' if average_reversal_duration is None else f'{average_reversal_duration:.2f}'} seconds
+- Median Reversal Duration: {'N/A' if median_reversal_duration is None else f'{median_reversal_duration:.2f}'} seconds
 - Average Duration of Induced Reversals: {'N/A' if average_duration_induced_reversals is None else f'{average_duration_induced_reversals:.2f}'} seconds
+- Median Duration of Induced Reversals: {'N/A' if median_duration_induced_reversals is None else f'{median_duration_induced_reversals:.2f}'} seconds
 
 Reversal Counts and Percentages:
 - Total Reversals: {total_reversals}

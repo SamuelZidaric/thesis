@@ -1,0 +1,108 @@
+Intensity Level: 0
+- Average Reaction Time: 1.7333333333333332
+- Median Reaction Time: 1.4125
+- Average Duration of Induced Reversals: 10.033333333333333
+- Median Duration of Induced Reversals: 12.4125
+- Counts of Different Statuses:
+No Reversal          32
+Already Reversing    15
+Reversals             3
+No movement           0
+dtype: int64
+
+- "Reversals": 8.57%
+- "No Reversal": 91.43%
+- "Already Reversing": 30.00%
+- "Not detected": 0.00%
+
+Intensity Level: 40
+- Average Reaction Time: 0.8458333333333332
+- Median Reaction Time: 0.95
+- Average Duration of Induced Reversals: 2.875
+- Median Duration of Induced Reversals: 1.0812499999999998
+- Counts of Different Statuses:
+No Reversal          27
+Already Reversing    17
+Reversals             6
+No movement           0
+dtype: int64
+
+- "Reversals": 18.18%
+- "No Reversal": 81.82%
+- "Already Reversing": 34.00%
+- "Not detected": 0.00%
+
+Intensity Level: 10
+- Average Reaction Time: 0.8875
+- Median Reaction Time: 0.75
+- Average Duration of Induced Reversals: 8.645
+- Median Duration of Induced Reversals: 7.7625
+- Counts of Different Statuses:
+Already Reversing    21
+No Reversal          23
+Reversals             5
+No movement           1
+dtype: int64
+
+- "Reversals": 17.86%
+- "No Reversal": 82.14%
+- "Already Reversing": 42.00%
+- "Not detected": 2.00%
+
+Intensity Level: 80
+- Average Reaction Time: 0.65
+- Median Reaction Time: 0.5375
+- Average Duration of Induced Reversals: 8.795833333333333
+- Median Duration of Induced Reversals: 6.0
+- Counts of Different Statuses:
+Already Reversing    15
+No Reversal          28
+Reversals             6
+No movement           1
+dtype: int64
+
+- "Reversals": 17.65%
+- "No Reversal": 82.35%
+- "Already Reversing": 30.00%
+- "Not detected": 2.00%
+
+Intensity Level: 20
+- Average Reaction Time: 0.975
+- Median Reaction Time: 1.0625
+- Average Duration of Induced Reversals: 12.671428571428573
+- Median Duration of Induced Reversals: 11.7
+- Counts of Different Statuses:
+Already Reversing    12
+No Reversal          28
+Reversals             7
+No movement           3
+dtype: int64
+
+- "Reversals": 20.00%
+- "No Reversal": 80.00%
+- "Already Reversing": 24.00%
+- "Not detected": 6.00%
+
+Intensity Level: 60
+- Average Reaction Time: 1.390625
+- Median Reaction Time: 1.15
+- Average Duration of Induced Reversals: 5.3687499999999995
+- Median Duration of Induced Reversals: 2.9625
+- Counts of Different Statuses:
+Reversals             4
+No Reversal          30
+Already Reversing    15
+No movement           1
+dtype: int64
+
+- "Reversals": 11.76%
+- "No Reversal": 88.24%
+- "Already Reversing": 30.00%
+- "Not detected": 2.00%
+
+Overall Duration Summary from rev_duration_all.xlsx:
+- Average Duration of Total Reversals: 7.95544009779951
+- Median Duration of Total Reversals: 3.5625
+Overall Duration Summary from rev_reaction.xlsx:
+- Average Duration of Total Reversals: 0.9999999999999999
+- Median Duration of Total Reversals: 0.7625

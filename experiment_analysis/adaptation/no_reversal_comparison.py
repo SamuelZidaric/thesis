@@ -49,9 +49,9 @@ group_counts = group_counts.sort_values(by='Group')  # Sort to ensure the order 
 for p, count in zip(ax.patches, group_counts['Count']):
     # The bar's width and position can be used to place text properly
     x_position = p.get_x() + p.get_width() / 2
-    y_position = p.get_height() + 3  # Small offset above the bar
-    ax.text(x_position, y_position, f'Count: {count}', 
-            ha='center', va='bottom', color='black', weight='semibold')
+    y_position = p.get_height() + 7  # Small offset above the bar
+    ax.text(x_position, y_position, f'n = {count}', 
+            ha='center', va='bottom', color='black', weight='semibold', bbox=dict(facecolor='white', alpha=0.5))
 
 plt.title('Comparison of "No Reversal" Instances Between ATR+ and ATR- Groups')
 plt.ylabel('Count')

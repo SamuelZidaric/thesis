@@ -1,0 +1,55 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
+import glob
+import numpy as np
+
+# Paths to the datasets
+group_1_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
+group_2_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+
+# Subdivision values for activation mapping
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Function to create a DataFrame with reaction times and intensities
+def create_reaction_time_dataframe(paths, subdivision_values):
+    df_list = []
+    for path in paths:
+        df = pd.read_excel(path)
+        df = df[df['Activation'] <= 30]  # Filter activations up to 30
+        for index, row in df.iterrows():
+            activation_index = row['Activation'] - 1
+            intensity = subdivision_values[activation_index % len(subdivision_values)]
+            reaction_time = pd.to_numeric(row['Status/Reaction Time'], errors='coerce')
+            if not pd.isna(reaction_time):
+                df_list.append({'Intensity': intensity, 'Reaction Time': reaction_time})
+    return pd.DataFrame(df_list)
+
+# Function to plot mean reaction times with confidence intervals
+def plot_mean_reaction_times_with_ci(df1, df2):
+    sns.set_theme()
+    plt.figure(figsize=(12, 8))
+
+    df_filtered1 = df1[df1['Intensity'] != 0]  # Exclude the 0 intensity subgroup
+    df_filtered2 = df2[df2['Intensity'] != 0]  # Exclude the 0 intensity subgroup
+
+    # Plot for Group 1
+    ax = sns.lineplot(data=df_filtered1, x='Intensity', y='Reaction Time', estimator='mean', ci=95, n_boot=1000, label='Group 1 Mean + 95% CI')
+    
+    # Plot for Group 2
+    ax2 = sns.lineplot(data=df_filtered2, x='Intensity', y='Reaction Time', estimator='mean', ci=95, n_boot=1000, label='Group 2 Mean + 95% CI')
+
+    plt.title('Mean Reaction Times by Intensity Level')
+    plt.xlabel('Intensity Level')
+    plt.ylabel('Mean Reaction Time (seconds)')
+    plt.legend()
+    plt.show()
+
+# Process the datasets
+df_group_1 = create_reaction_time_dataframe(glob.glob(os.path.join(group_1_path, 'w*/*Ch0/rev_reaction.xlsx')), subdivision_values)
+df_group_2 = create_reaction_time_dataframe(glob.glob(os.path.join(group_2_path, 'w*/*Ch0/rev_reaction.xlsx')), subdivision_values)
+
+# Plot the mean reaction times comparison between two groups with 95% CI
+plot_mean_reaction_times_with_ci(df_group_1, df_group_2)
+

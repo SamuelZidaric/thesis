@@ -6,7 +6,7 @@ import os
 import glob
 
 # Your main path
-main_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/int_neg/data/'
 
 # Glob pattern to match the file structure you mentioned
 rev_reaction_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
@@ -47,7 +47,7 @@ status_counts = all_data.groupby('Group')['Status'].value_counts(normalize=True)
 # Plotting the frequencies of 'Valid Reversals', 'No Reversal', and 'Already Reversing'
 ax = status_counts[['Valid Reversals', 'No Reversal', 'Already Reversing']].plot(kind='bar', stacked=True, figsize=(14, 8), color=['green', 'red', 'yellow'], legend=True)
 plt.title('Frequency of Reversal Status by Group')
-plt.xlabel('Group')
+plt.xlabel('LED Power')
 plt.ylabel('Frequency')
 
 # Annotate percentages on each bar

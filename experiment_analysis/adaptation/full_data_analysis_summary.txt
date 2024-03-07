@@ -1,0 +1,29 @@
+
+Comprehensive Data Analysis Summary:
+
+Overall Dataset Summary:
+- Average Reaction Time: 0.70 seconds
+- Median Reaction Time: 0.57 seconds
+- Average Reversal Duration (Total): 6.53 seconds
+- Median Reversal Duration: 4.73 seconds
+- Average Duration of Induced Reversals: 8.40 seconds
+- Median Duration of Induced Reversals: 6.42 seconds
+
+Reversal Counts and Percentages:
+- Total Reversals: 838
+  - Stochastic (Naturally Occurring) Reversals: 339.0 (40.45% of Total)
+  - Induced Reversals: 499.0 (59.55% of Total)
+
+Subgroup Analysis (Up to Activation 56):
+- Counts of Different Statuses:
+  - "Reversals": 499.0
+  - "Already Reversing": 50.0
+  - "No Reversal": 8.0 (if applicable)
+  - "Not detected": 3.0 (if applicable)
+
+
+- Percentages of Each Status within Subgroup:
+  - "Reversals": 98.42%
+  - "No Reversal": 1.58%
+  - "Already Reversing": 8.93%
+  - "Not detected": 0.54%

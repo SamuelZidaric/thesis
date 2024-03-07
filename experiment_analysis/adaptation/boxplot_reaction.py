@@ -42,14 +42,14 @@ total_sample_size = filtered_data['Identifier'].count()
 # Visualization with Seaborn: Box plot and strip plot of reaction times by Identifier
 plt.figure(figsize=(12, 8))
 sns.boxplot(x='Identifier', y='Numeric Reaction Time', data=filtered_data, color='lightgray', showfliers=False)
-sns.stripplot(x='Identifier', y='Numeric Reaction Time', data=filtered_data, size=4, color='darkblue', alpha=0.5)
-plt.title('Distribution of Reaction Times by Individual Worm')
+sns.stripplot(x='Identifier', y='Numeric Reaction Time', data=filtered_data, color='black', alpha=0.5)
+plt.title('Distribution of Reaction Times by Individual Worm in ATR-')
 plt.xlabel('Worms')
 plt.ylabel('Reaction Time (seconds)')
 plt.grid(True)
 plt.xticks(rotation=45)  # Rotate labels if they overlap
 # Add a textbox with the total sample size
-plt.text(0.95, 0.95, f'Total sample size = {total_sample_size}', transform=plt.gcf().transFigure, 
+plt.text(0.94, 0.95, f'Total sample size = {total_sample_size}', transform=plt.gcf().transFigure, 
          ha='right', va='top', bbox=dict(facecolor='white', alpha=0.5))
 plt.tight_layout()
 plt.show()

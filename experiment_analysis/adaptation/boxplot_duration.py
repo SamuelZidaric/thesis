@@ -6,7 +6,8 @@ import os
 import glob
 
 # Your main path
-main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_neg_uli/data/'
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_pos_uli/data/'
+
 
 # Glob pattern to match the file structure you mentioned
 rev_duration_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_duration_all.xlsx'))
@@ -44,14 +45,14 @@ total_sample_size = filtered_data['Identifier'].count()
 
 # Visualization with Seaborn: Bar plot of reversal probabilities by Activation
 plt.figure(figsize=(12, 8))
-barplot = sns.barplot(x='Identifier', y='Duration (seconds)', data=filtered_data, color='lightblue')
+boxplot = sns.boxplot(x='Identifier', y='Duration (seconds)', data=filtered_data, color='lightblue')
 sns.stripplot(x='Identifier', y='Duration (seconds)', data=filtered_data, size=4, color='darkblue', alpha=0.5)
 plt.title('Distribution of Reversal Durations by Individual Worm')
 plt.xlabel('Worms')
-plt.ylabel('Reversal timeframes (seconds)')
+plt.ylabel('Reversal duration (seconds)')
 plt.xticks(rotation=45)  # Rotate labels if they overlap
 # Add a textbox with the total sample size
-plt.text(0.95, 0.95, f'Total sample size = {total_sample_size}', transform=plt.gcf().transFigure, 
+plt.text(0.94, 0.95, f'n = {total_sample_size}', transform=plt.gcf().transFigure, 
          ha='right', va='top', bbox=dict(facecolor='white', alpha=0.5))
 plt.tight_layout()
 plt.show()

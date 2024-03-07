@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import glob
+from scipy.stats import linregress
 
 # Your main path
-main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_neg_uli/data/'
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_pos_uli/data/'
 
 # Glob pattern to match the file structure you mentioned
 rev_reaction_paths_list = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
@@ -30,25 +31,41 @@ for file_path in rev_reaction_paths_list:
     # Append the filtered data to the all_data DataFrame
     all_data = pd.concat([all_data, temp_data], ignore_index=True)
 
-# Convert 'Status/Reaction Time' to numeric, coercing errors to NaN (this will filter out non-numeric values)
+# Convert 'Status/Reaction Time' to numeric, coercing errors to NaN
 all_data['Numeric Reaction Time'] = pd.to_numeric(all_data['Status/Reaction Time'], errors='coerce')
 
-# Ensure 'Activation' is numeric and not NaN
+# Ensure 'Activation' is numeric
 all_data['Activation'] = pd.to_numeric(all_data['Activation'], errors='coerce')
 all_data.dropna(subset=['Activation', 'Numeric Reaction Time'], inplace=True)
 
-# Calculate the total sample size
-total_sample_size = all_data['Numeric Reaction Time'].count()  # This should be all_data, not filtered_data
+# Group by 'Activation' and calculate medians
+median_data = all_data.groupby('Activation').agg({'Numeric Reaction Time': 'median'}).reset_index()
 
-# Visualization with Seaborn: Scatter plot with regression line of reaction times by Activation
+# Calculate regression line based on median values
+slope, intercept, r_value, p_value, std_err = linregress(median_data['Activation'], median_data['Numeric Reaction Time'])
+
+# Plot the original data
 plt.figure(figsize=(12, 8))
-sns.regplot(x='Activation', y='Numeric Reaction Time', data=all_data, scatter_kws={'alpha':0.5}, line_kws={'color':'darkred'})
-plt.title('Reaction Times by Activation Number')
+plt.scatter(all_data['Activation'], all_data['Numeric Reaction Time'], alpha=0.5)
+
+# Plot the median-based regression line
+x = np.array([min(all_data['Activation']), max(all_data['Activation'])])
+y = intercept + slope * x
+plt.plot(x, y, color='darkred', label=f'Median Regression Line\nSlope: {slope:.2f}, Intercept: {intercept:.2f}')
+
+# Add plot labels and legend
+plt.title('Reaction Times by Activation Number in ATR+ group')
 plt.xlabel('Activation Number')
 plt.ylabel('Reaction Time (seconds)')
+plt.legend()
 plt.grid(True)
+
+# Calculate the total sample size
+total_sample_size = all_data['Numeric Reaction Time'].count()
+
 # Add a textbox with the total sample size
-plt.text(0.95, 0.95, f'Total sample size = {total_sample_size}', transform=plt.gcf().transFigure, 
+plt.text(0.94, 0.95, f'n = {total_sample_size}', transform=plt.gcf().transFigure, 
          ha='right', va='top', bbox=dict(facecolor='white', alpha=0.5))
+
 plt.tight_layout()
 plt.show()

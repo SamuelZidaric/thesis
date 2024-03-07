@@ -1,0 +1,82 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
+import glob
+import numpy as np
+import statsmodels.api as sm
+
+# Define the main path to your data and the mapping from Activation numbers to intensity levels
+group_1_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
+group_2_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Function to aggregate reversal durations and intensity levels into a DataFrame
+def create_reversal_duration_dataframe(paths, subdivision_values):
+    df_list = []
+
+    for path in paths:
+        df = pd.read_excel(path)
+        df = df[df['Activation'] <= 30]  # Filter activations up to 30
+        
+        for index, row in df.iterrows():
+            activation_index = row['Activation'] - 1
+            intensity = subdivision_values[activation_index % len(subdivision_values)]
+            
+            # Use 'Reversal duration' instead of 'Status/Reaction Time'
+            reversal_duration = row.get('Reversal duration', np.nan)
+            
+            if not pd.isna(reversal_duration):
+                df_list.append({'Intensity': intensity, 'Reversal Duration': reversal_duration})
+    
+
+    return pd.DataFrame(df_list)
+
+def plot_reversal_durations_with_regression_and_confidence_intervals(df1, df2, label1, label2):
+    plt.figure(figsize=(12, 8))
+
+    # Function to plot regression line with confidence intervals
+    def plot_regression_with_confidence(df, color, label):
+        # Exclude the 0 intensity subgroup and prepare data for regression
+        df_filtered = df[df['Intensity'] != 0]
+
+        # Calculate medians for each intensity
+        median_durations = df_filtered.groupby('Intensity')['Reversal Duration'].median().reset_index()
+
+        # Plot median data points as scatter plot
+        sns.scatterplot(x='Intensity', y='Reversal Duration', data=median_durations, color=color, alpha=0.5, s=100, label=f'{label} Median')
+
+        X = df_filtered[['Intensity']]
+        Y = df_filtered['Reversal Duration']
+        X = sm.add_constant(X)  # Adds a constant term to the predictor
+
+        model = sm.OLS(Y, X).fit()  # Fit the regression model
+        
+        # Generate prediction and confidence interval
+        x_plot = sm.add_constant(pd.DataFrame({'Intensity': np.linspace(df_filtered['Intensity'].min(), df_filtered['Intensity'].max(), 300)}))
+        predictions = model.get_prediction(x_plot)
+        prediction_summary = predictions.summary_frame(alpha=0.05)  # 95% confidence interval
+
+        plt.plot(x_plot['Intensity'], prediction_summary['mean'], color=color, label=f'{label} Regression Line')
+        plt.fill_between(x_plot['Intensity'], prediction_summary['mean_ci_lower'], prediction_summary['mean_ci_upper'], color=color, alpha=0.2)
+
+    # Plot for both groups
+    plot_regression_with_confidence(df1, 'blue', label1)
+    plot_regression_with_confidence(df2, 'green', label2)
+
+    plt.title('Regression Lines for Reversal Durations by Intensity Level in ATR+ and ATR- Groups')
+    plt.xlabel('Intensity Level')
+    plt.ylabel('Reversal Duration (seconds)')
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+# Process the datasets
+df_group_1 = create_reversal_duration_dataframe(glob.glob(os.path.join(group_1_path, 'w*/*Ch0/rev_reaction.xlsx')), subdivision_values)
+df_group_2 = create_reversal_duration_dataframe(glob.glob(os.path.join(group_2_path, 'w*/*Ch0/rev_reaction.xlsx')), subdivision_values)
+
+# Plot the reversal durations with regression lines and confidence intervals
+plot_reversal_durations_with_regression_and_confidence_intervals(df_group_1, df_group_2, 'ATR+', 'ATR-')
+
+

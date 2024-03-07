@@ -1,0 +1,40 @@
+import pandas as pd
+import os
+import glob
+
+# Your main path
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_pos_uli/data/'
+
+paths = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
+
+# Assuming the create_reaction_time_dataframe function is defined as previously discussed
+def create_reaction_and_reversal_duration_dataframe(paths, subdivision_values):
+    df_list = []
+    for path in paths:
+        df = pd.read_excel(path)
+        # Adjust the filter for 'Activation' if necessary
+        df = df[df['Activation'] <= 30]  # Keeping your original filter
+        for index, row in df.iterrows():
+            activation_index = row['Activation'] - 1
+            intensity = subdivision_values[activation_index % len(subdivision_values)]
+            reaction_time = pd.to_numeric(row['Status/Reaction Time'], errors='coerce')
+            reversal_duration = pd.to_numeric(row['Reversal duration'], errors='coerce')
+            # Including both reaction time and reversal duration in the data collection
+            if not pd.isna(reaction_time) or not pd.isna(reversal_duration):
+                df_list.append({
+                    'Intensity': intensity, 
+                    'Reaction Time': reaction_time,
+                    'Reversal Duration': reversal_duration
+                })
+    return pd.DataFrame(df_list)
+
+# Replace 'your_file_paths_here' with the actual paths of your Excel files
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Create the dataset
+dataset = create_reaction_and_reversal_duration_dataframe(paths, subdivision_values)
+
+# Save the dataset to an HDF5 file
+dataset.to_csv('reaction_times_variable_pos.csv', index=False)
+
+print("Dataset has been saved to 'reaction_times_variable_.h5'")

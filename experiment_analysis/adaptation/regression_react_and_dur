@@ -1,0 +1,66 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import statsmodels.api as sm
+import glob
+import os
+
+# Define your main path
+main_path = 'Z:/neurobiology/zimmer/zidaric/data/pre_pos_uli/data/'
+
+# Glob pattern to match the file structure
+file_paths = glob.glob(os.path.join(main_path, 'w*/*Ch0/rev_reaction.xlsx'))
+
+def perform_regression_analysis_on_grouped_data(file_paths):
+    all_data = []  # List to hold data from all files
+    
+    for file_path in file_paths:
+        # Load the data
+        df = pd.read_excel(file_path)
+        df = df[df['Activation'] <= 56]  # Filter activations up to 30
+
+        # Append to the list
+        all_data.append(df)
+    
+    # Concatenate all data into a single DataFrame
+    combined_df = pd.concat(all_data, ignore_index=True)
+    
+    # Convert 'Status/Reaction Time' to numeric, setting errors='coerce' to turn non-numeric values into NaN
+    combined_df['Reaction Time'] = pd.to_numeric(combined_df['Status/Reaction Time'], errors='coerce')
+    
+    # Filter out rows with NaN values in 'Reaction Time' or 'Reversal duration'
+    cleaned_df = combined_df.dropna(subset=['Reaction Time', 'Reversal duration'])
+    
+    # Prepare data for regression
+    X = cleaned_df[['Reaction Time']]
+    Y = cleaned_df['Reversal duration']
+    X = sm.add_constant(X)  # Adds a constant term to the predictor
+    
+    # Fit the regression model
+    model = sm.OLS(Y, X).fit()
+    
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(x='Reaction Time', y='Reversal duration', data=cleaned_df, label='Actual Data', color='blue', alpha=0.6)
+    sns.lineplot(x='Reaction Time', y=model.predict(X), data=cleaned_df, color='red', label='Regression Line')
+    
+    plt.title('Regression Analysis Between Reaction Times and Reversal Durations')
+    plt.xlabel('Reaction Time (seconds)')
+    plt.ylabel('Reversal Duration (seconds)')
+    plt.legend()
+    plt.grid(True)
+    total_sample_size = len(cleaned_df)
+    plt.text(0.94, 0.95, f'n = {total_sample_size}', transform=plt.gcf().transFigure, 
+             ha='right', va='top', bbox=dict(facecolor='white', alpha=0.5))
+
+    plt.tight_layout()
+    plt.show()
+    
+    # Print the summary of the regression model
+    print(model.summary())
+
+# Perform the analysis on grouped data from all matched files
+perform_regression_analysis_on_grouped_data(file_paths)
+
+

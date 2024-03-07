@@ -1,0 +1,57 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import glob
+import os
+
+group_1_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_pos/data/'
+group_2_path = 'Z:/neurobiology/zimmer/zidaric/data/uli_pip/int_neg/data/'
+
+# Define the subdivision values for each activation in the specified order
+subdivision_values = [60, 0, 40, 10, 80, 20, 40, 10, 60, 20, 80, 0, 40, 60, 80, 20, 10, 0, 60, 40, 20, 80, 0, 10, 60, 40, 80, 0, 10, 20]
+
+# Function to process and return the reversal data for a group
+def process_group_data(paths):
+    group_data = pd.DataFrame()
+    for file_path in paths:
+        temp_data = pd.read_excel(file_path)
+        if 'Activation' in temp_data.columns:
+            temp_data = temp_data[temp_data['Activation'] <= 30]
+        temp_data['Subdivision'] = temp_data['Activation'].apply(lambda x: subdivision_values[x-1] if x <= len(subdivision_values) else None)
+        group_data = pd.concat([group_data, temp_data], ignore_index=True)
+    return group_data
+
+# Process data for both groups
+group_1_data = process_group_data(glob.glob(os.path.join(group_1_path, 'w*/*Ch0/rev_reaction.xlsx')))
+group_2_data = process_group_data(glob.glob(os.path.join(group_2_path, 'w*/*Ch0/rev_reaction.xlsx')))
+
+# Function to calculate frequencies and plot for a group
+def plot_median_frequencies(group_data, label, color):
+    # Calculate frequencies of valid reversals for plotting
+    group_data['Status'] = np.where(group_data['Status/Reaction Time'] == 'No Reversal', 'No Reversal',
+                                    np.where(group_data['Status/Reaction Time'] == 'Already Reversing', 'Already Reversing', 'Valid Reversals'))
+    grouped_data = group_data.groupby(['Subdivision', 'Status']).size().reset_index(name='Counts')
+    valid_reversals = grouped_data[grouped_data['Status'] == 'Valid Reversals']
+
+    total_counts_per_subdivision = group_data.groupby('Subdivision').size()
+    valid_reversals['Frequency'] = valid_reversals['Counts'] / total_counts_per_subdivision.reindex(valid_reversals['Subdivision']).values
+    median_frequencies = valid_reversals.groupby('Subdivision')['Frequency'].median().reset_index()
+
+    # Plot median frequencies as points
+    plt.scatter(median_frequencies['Subdivision'], median_frequencies['Frequency'], color=color, label=label + ' Median')
+
+    # Connect median points with a line
+    plt.plot(median_frequencies['Subdivision'], median_frequencies['Frequency'], color=color)
+
+# Plotting
+plt.figure(figsize=(12, 7))
+plot_median_frequencies(group_1_data, 'ATR+', 'blue')
+plot_median_frequencies(group_2_data, 'ATR-', 'green')
+
+plt.title('Comparison of Frequencies of Induced Reversals by Intensity Level for ATR+ and ATR- Groups')
+plt.xlabel('Intensity Level')
+plt.ylabel('Frequency of Valid Reversals')
+plt.ylim(0, 1)  # Ensure y-axis ranges from 0 to 1 to match frequency scale
+plt.legend()
+plt.grid(True)
+plt.show()
